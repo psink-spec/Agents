@@ -12,3 +12,5 @@ Format: `YYYY-MM-DD HH:MM | <agent-name> | <ticket-id or -> | <stage> | <status 
 2026-07-21 16:32 | code-reviewer | 001-health-endpoint-status-page | code-review | READY_TO_SHIP | 0 blockers / 0 majors / 1 minor; security checklist clean (secrets/injection/authz/unsafe all PASS with evidence), node --check + AC1-5 gates green; VERDICT PASS.
 2026-07-21 16:28 | whimsy-injector | 001-health-endpoint-status-page | delight | BLOCKED | Attempted badge fade-in (3 trim iterations, all AC-passing) but every candidate exceeded the 2% size budget once the mandatory prefers-reduced-motion guard was included; reverted to QA-passed baseline, no product code changed, ticket itself remains READY_TO_SHIP.
 2026-07-21 16:45 | project-shipper | 001-health-endpoint-status-page | ship | DONE | Shipped: 5/5 ACs evidenced PASS + code review PASS verified, post-whimsy byte-identical revert accepted on evidence; README endpoints doc added, CHANGELOG.md created, ship summary + rollback plan (git revert ffa2e50) written to review.md.
+2026-07-21 18:42 | unknown | - | subagent-stop | - | hook: run completed
+2026-07-21 18:44 | unknown | - | subagent-stop | - | hook: run completed
