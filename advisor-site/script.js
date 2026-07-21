@@ -287,11 +287,12 @@
     function useVideo() { if (scene) scene.classList.add("has-video"); }
     video.addEventListener("loadeddata", useVideo);
     video.addEventListener("error", useFallback);
-    var src = video.querySelector("source");
-    if (src) src.addEventListener("error", useFallback);
-    /* the 404 may have fired during parsing, before this deferred script ran —
+    /* when every <source> fails, the error event fires on the LAST one */
+    var sources = video.querySelectorAll("source");
+    if (sources.length) sources[sources.length - 1].addEventListener("error", useFallback);
+    /* the failure may have fired during parsing, before this deferred script ran —
        and a video with no <source> at all never fires an error */
-    if (!src || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
+    if (!sources.length || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
     if (video.readyState >= 2) useVideo();
     if (reducedMotion.matches) video.pause();
   });
