@@ -1,0 +1,7 @@
+.agents/
+.claude/skills/
+advisor-site/assets/work-*/
+advisor-site/video/*/snapshots/
+advisor-site/video/*/renders/
+advisor-site/video/*/node_modules/
+advisor-site/video/*/.hyperframes/
