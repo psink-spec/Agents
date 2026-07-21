@@ -25,7 +25,7 @@ Every item must be binary and testable — a gate agent must be able to prove PA
 P0 — RICE: Reach ~5 pipeline operators+agents/quarter × Impact 3 (blocks pipeline smoke test = blocks validating all shipped work) × Confidence 100% ÷ Effort 0.25 weeks = 60; it is the pipeline smoke test, which forces P0 regardless.
 
 ## Status
-READY_TO_SHIP
+DONE
 
 <!-- Allowed statuses:
 DRAFT | READY_FOR_DESIGN | READY_FOR_BUILD | IN_BUILD | READY_FOR_QA |

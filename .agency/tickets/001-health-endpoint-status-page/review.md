@@ -129,3 +129,33 @@ server stopped cleanly
 1. `smoke-test/server.js:23` — `formatUptime` renders exact-hour uptimes with a trailing `0s` (e.g. `1h 0s`). Consider dropping trailing zero-value units for cleaner display. Cosmetic; ticket separately if desired.
 
 VERDICT: PASS
+
+## Ship summary — 2026-07-21
+
+Shipped by project-shipper. Ship date: 2026-07-21.
+
+### Final checklist
+
+| Check | Result | Evidence |
+|---|---|---|
+| Evidence PASS (5/5 ACs) | OK | QA section above: AC1–AC5 each PASS with pasted curl/node output; count matches ticket.md's 5 criteria; no evidence-free PASS lines. Code review VERDICT PASS, 0 blockers/majors, 1 minor logged to .agency/BACKLOG.md. |
+| Post-whimsy state | OK | whimsy-injector reverted all changes — smoke-test/server.js git-verified byte-identical to the reviewed baseline; AC1–AC5 + `node --check` re-run green post-revert (assets/whimsy-notes.md). Shipper independently read server.js and confirmed it matches the reviewed implementation. |
+| Docs | OK | smoke-test/README.md updated: documents `/health` (JSON contract), `/status` (HTML uptime page), 404 behavior, and the no-`package.json` / no-install workflow. Facts taken from handoff.md + server.js only. |
+| Changelog | OK | /home/user/Agents/CHANGELOG.md created with entry `## 2026-07-21 — 001 Health endpoint + HTML status page for smoke-test app`. |
+| Rollback plan | OK | Written below (obvious from handoff: single implementation commit over recorded baseline). |
+
+### Changelog entry (as written)
+
+- Added `GET /health` to `smoke-test/server.js`: machine-readable liveness probe returning `{"status":"ok","uptime_seconds":<integer>}` as `application/json` (HEAD supported).
+- Added `GET /status`: self-contained HTML status page (inline CSS, no client JS, no external assets) showing the server's uptime from the same source as `/health` (HEAD supported).
+- Removed `smoke-test/package.json` — the smoke-test app is now fully dependency-free; run with plain `node smoke-test/server.js`. Existing `/` response and 404 JSON behavior unchanged.
+
+### Rollback plan
+
+The entire change is one implementation commit on `smoke-test/` (baseline `9750133` → implementation `ffa2e50`, per code review's change-surface diff; no migrations, no config, no feature flags, no dependencies). To undo:
+
+1. `git revert ffa2e50` — restores the previous `smoke-test/server.js` (routes `/` and 404 only) and restores `smoke-test/package.json`.
+2. Restart with `node smoke-test/server.js`.
+3. Verify rollback: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/` → `200` and `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health` → `404`.
+
+Also revert the doc/changelog edits if rolling back permanently: the Endpoints section added to `smoke-test/README.md` and the 001 entry in `CHANGELOG.md`.
