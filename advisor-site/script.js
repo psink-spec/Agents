@@ -11,12 +11,45 @@
     return t ? t === "dark" : darkMq.matches;
   }
 
-  /* ---- Scroll progress ---- */
+  /* ---- Kinetic word-split for giant headlines ---- */
+  function splitWords(el) {
+    (function walk(node) {
+      if (node.nodeType === 3) {
+        var frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+          var s = document.createElement("span");
+          s.className = "w";
+          s.textContent = part;
+          frag.appendChild(s);
+        });
+        node.parentNode.replaceChild(frag, node);
+      } else if (node.nodeType === 1 && node.tagName !== "BR") {
+        Array.prototype.slice.call(node.childNodes).forEach(walk);
+      }
+    })(el);
+    Array.prototype.forEach.call(el.querySelectorAll(".w"), function (w, i) {
+      w.style.setProperty("--i", String(i));
+    });
+  }
+  document.querySelectorAll(".giant").forEach(splitWords);
+  var heroH = document.getElementById("hero-h");
+  if (heroH) requestAnimationFrame(function () { requestAnimationFrame(function () { heroH.classList.add("is-visible"); }); });
+
+  /* ---- Scroll progress + hero parallax ---- */
   var progressEl = document.querySelector(".progress");
+  var heroInner = document.querySelector(".hero .scene-inner");
   function onScroll() {
     var doc = document.documentElement;
     var max = doc.scrollHeight - doc.clientHeight;
     if (progressEl && max > 0) progressEl.style.setProperty("--scroll", String(doc.scrollTop / max));
+    if (heroInner && !reducedMotion.matches) {
+      var y = doc.scrollTop;
+      var vh = window.innerHeight || 1;
+      heroInner.style.transform = "translateY(" + y * 0.22 + "px)";
+      heroInner.style.opacity = String(Math.max(1 - y / (vh * 0.9), 0));
+    }
   }
   document.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
@@ -32,6 +65,20 @@
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  }
+
+  /* ---- Magnetic buttons (fine pointers only) ---- */
+  if (window.matchMedia("(pointer: fine)").matches) {
+    document.querySelectorAll(".button, .nav-cta").forEach(function (btn) {
+      btn.addEventListener("mousemove", function (e) {
+        if (reducedMotion.matches) return;
+        var r = btn.getBoundingClientRect();
+        var dx = (e.clientX - r.left - r.width / 2) / r.width;
+        var dy = (e.clientY - r.top - r.height / 2) / r.height;
+        btn.style.transform = "translate(" + (dx * 10).toFixed(1) + "px," + (dy * 7).toFixed(1) + "px)";
+      });
+      btn.addEventListener("mouseleave", function () { btn.style.transform = ""; });
+    });
   }
 
   /* ---- Counters (placeholder [replace] values are left untouched) ---- */
@@ -220,25 +267,34 @@
     .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   document.addEventListener("visibilitychange", function () { if (document.hidden) stopFx(); else startFx(); });
 
-  /* ---- Film scene: if the real 4K file is missing, run the silk canvas instead ---- */
-  var film = document.querySelector(".film-video");
-  var filmFallback = document.querySelector(".film-fallback");
-  if (film && filmFallback) {
-    var useFallback = function () {
-      if (!filmFallback.hidden) return;
-      film.hidden = true;
-      filmFallback.hidden = false;
-      var s = setupCanvas(filmFallback);
-      if (s) { canvases.push(s); if (reducedMotion.matches) drawSilk(s, 0); }
-    };
-    film.addEventListener("error", useFallback);
-    var src = film.querySelector("source");
+  /* ---- Video scenes: real footage when present, canvas art when not ---- */
+  document.querySelectorAll("video[data-video-scene]").forEach(function (video) {
+    var scene = video.closest(".scene");
+    var fallback = scene ? scene.querySelector("canvas.fx") : null;
+    function useFallback() {
+      if (video.hidden) return;
+      video.hidden = true;
+      if (scene) scene.classList.remove("has-video");
+      if (fallback && fallback.hidden) {
+        fallback.hidden = false;
+        var s = setupCanvas(fallback);
+        if (s && draws[s.kind]) {
+          canvases.push(s);
+          if (reducedMotion.matches) draws[s.kind](s, 0);
+        }
+      }
+    }
+    function useVideo() { if (scene) scene.classList.add("has-video"); }
+    video.addEventListener("loadeddata", useVideo);
+    video.addEventListener("error", useFallback);
+    var src = video.querySelector("source");
     if (src) src.addEventListener("error", useFallback);
     /* the 404 may have fired during parsing, before this deferred script ran —
        and a video with no <source> at all never fires an error */
-    if (!src || film.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
-    if (reducedMotion.matches) film.pause();
-  }
+    if (!src || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
+    if (video.readyState >= 2) useVideo();
+    if (reducedMotion.matches) video.pause();
+  });
 
   /* ---- Live availability ---- */
   fetch("assets/status.json", { cache: "no-store" })

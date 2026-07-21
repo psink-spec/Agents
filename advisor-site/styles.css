@@ -174,6 +174,26 @@ img, video { max-width: 100%; height: auto; display: block; }
   inline-size: 100%;
 }
 
+.scene-video {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* when real footage is playing, text flips to film treatment over a scrim */
+.scene.has-video { color: var(--film-ink); }
+.scene.has-video .eyebrow { color: var(--accent-bright); }
+.scene.has-video .lede { color: color-mix(in srgb, var(--film-ink) 78%, transparent); }
+.scene.has-video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgb(8 16 24 / 0.78) 30%, rgb(8 16 24 / 0.22));
+}
+.scene.has-video .scene-inner { z-index: 1; }
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--step--1);
@@ -188,6 +208,8 @@ img, video { max-width: 100%; height: auto; display: block; }
 
 .button {
   display: inline-block;
+  position: relative;
+  overflow: hidden;
   background: var(--btn-bg);
   color: var(--btn-ink);
   border: 1px solid transparent;
@@ -199,7 +221,17 @@ img, video { max-width: 100%; height: auto; display: block; }
   cursor: pointer;
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
-.button:hover { transform: translateY(-2px) scale(1.02); box-shadow: var(--shadow); }
+.button:hover { box-shadow: var(--shadow); }
+.button::after {
+  /* shine sweep on hover */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 32%, rgb(255 255 255 / 0.35) 50%, transparent 68%);
+  transform: translateX(-130%);
+  transition: transform 650ms ease;
+}
+.button:hover::after { transform: translateX(130%); }
 
 .scroll-cue {
   position: absolute;
@@ -254,21 +286,21 @@ img, video { max-width: 100%; height: auto; display: block; }
 }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
-/* ============ FILM SCENE ============ */
+.marquee--rev { border-top: 1px solid var(--line); margin-top: var(--space-s); padding-top: var(--space-s); }
+.marquee--rev .marquee-track {
+  animation-direction: reverse;
+  animation-duration: 48s;
+  font-style: italic;
+  color: color-mix(in srgb, var(--ink-soft) 55%, transparent);
+}
+
+/* ============ FILM SCENE (always dark, video or silk) ============ */
 .film { color: var(--film-ink); background: var(--navy); }
 .film .eyebrow { color: var(--accent-bright); }
 .film .lede { color: color-mix(in srgb, var(--film-ink) 78%, transparent); }
 .film em { color: var(--accent-bright); }
-
-.film-video, .film-fallback {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-}
 .film::after {
-  /* legibility scrim over footage */
+  /* legibility scrim, footage or fallback */
   content: "";
   position: absolute;
   inset: 0;
@@ -412,6 +444,17 @@ img, video { max-width: 100%; height: auto; display: block; }
 }
 .js .reveal.is-visible { opacity: 1; transform: none; }
 
+/* word-by-word kinetic headlines (spans injected by script.js) */
+.js .giant .w {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.55em);
+  filter: blur(8px);
+  transition: opacity 600ms ease, transform 750ms cubic-bezier(0.2, 0.7, 0.1, 1), filter 650ms ease;
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js .giant.is-visible .w { opacity: 1; transform: none; filter: none; }
+
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
@@ -419,8 +462,9 @@ img, video { max-width: 100%; height: auto; display: block; }
 @media (prefers-reduced-motion: reduce) {
   .js .kinetic { animation: none; opacity: 1; transform: none; }
   .js .reveal { opacity: 1; transform: none; transition: none; }
+  .js .giant .w { opacity: 1; transform: none; filter: none; transition: none; }
   .marquee-track { animation: none; }
   .cue-line { animation: none; }
   .dot { animation: none; }
-  .button { transition: none; }
+  .button, .button::after { transition: none; }
 }
