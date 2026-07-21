@@ -1,0 +1,10 @@
+{
+  "name": "agency-smoke-test",
+  "version": "0.1.0",
+  "description": "Minimal web server used as the test subject for The Agency's pipeline smoke test",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT"
+}
