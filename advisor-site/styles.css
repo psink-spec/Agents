@@ -346,6 +346,7 @@ img, video { max-width: 100%; height: auto; display: block; }
 .film .eyebrow { color: var(--accent-bright); }
 .film .lede { color: color-mix(in srgb, var(--film-ink) 78%, transparent); }
 .film em { color: var(--accent-bright); }
+.film a { color: var(--accent-bright); } /* --accent is too dark on navy in light theme */
 .film::after {
   /* legibility scrim, footage or fallback */
   content: "";
