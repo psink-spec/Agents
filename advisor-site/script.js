@@ -234,8 +234,9 @@
     film.addEventListener("error", useFallback);
     var src = film.querySelector("source");
     if (src) src.addEventListener("error", useFallback);
-    /* the 404 may have fired during parsing, before this deferred script ran */
-    if (film.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
+    /* the 404 may have fired during parsing, before this deferred script ran —
+       and a video with no <source> at all never fires an error */
+    if (!src || film.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
     if (reducedMotion.matches) film.pause();
   }
 
