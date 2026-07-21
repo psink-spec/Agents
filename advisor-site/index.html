@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Paul Sinclair — Financial Advisor | CI Assante Wealth Management</title>
-  <meta name="description" content="Personalized wealth management with Paul Sinclair, Financial Advisor with CI Assante Wealth Management — retirement planning, wealth accumulation, and risk management built around your life.">
+  <title>Paul Sinclair — Wealth, Choreographed | CI Assante Wealth Management</title>
+  <meta name="description" content="Cinematic wealth planning with Paul Sinclair, Financial Advisor with CI Assante Wealth Management.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,192 +14,138 @@
 </head>
 <body>
 
-<div class="progress" aria-hidden="true"></div><!-- div: decorative scroll-progress bar, no semantic role -->
+<div class="progress" aria-hidden="true"></div><!-- div: decorative scroll-progress bar -->
 
 <header class="site-header">
   <nav aria-label="Primary">
-    <a class="brand" href="#top">Paul&nbsp;Sinclair<span class="brand-sub">CI Assante Wealth Management</span></a>
-    <ul>
-      <li><a href="#approach">Approach</a></li>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#proof">Results</a></li>
-      <li><a class="nav-cta" href="#contact">Book a conversation</a></li>
-    </ul>
+    <a class="brand" href="#top">PS<span class="brand-sub">Paul Sinclair · CI Assante</span></a>
+    <a class="nav-cta" href="#contact">Talk to Paul</a>
   </nav>
 </header>
 
 <main id="top">
 
-  <!-- ===== HERO ===== -->
-  <section class="hero" aria-labelledby="hero-h">
-    <canvas class="hero-canvas" width="1600" height="900" aria-hidden="true"></canvas>
-    <div class="hero-inner"><!-- div: positioning layer above the canvas, styling hook only -->
-      <p class="eyebrow">WEALTH, PLANNED PROPERLY</p>
-      <h1 id="hero-h">Your money should fund a life, <em>not a spreadsheet.</em></h1>
-      <p class="lede">
-        I'm Paul Sinclair, a financial advisor with CI Assante Wealth Management.
-        I build personalized plans for retirement, wealth accumulation, and risk —
-        so every dollar you've earned has a job, and you know exactly what it is.
+  <!-- ===== SCENE 1 · HERO ===== -->
+  <section class="scene hero" aria-labelledby="hero-h">
+    <canvas class="fx" data-fx="field" aria-hidden="true"></canvas>
+    <div class="scene-inner"><!-- div: layer above canvas, styling hook only -->
+      <p class="eyebrow kinetic">PAUL SINCLAIR · FINANCIAL ADVISOR</p>
+      <h1 id="hero-h" class="giant kinetic">Wealth,<br>choreographed.</h1>
+      <p class="lede kinetic">Retirement, growth, and risk — one plan, in motion.</p>
+      <p class="hero-actions kinetic">
+        <a class="button" href="#contact">Start the conversation</a>
       </p>
-      <p class="hero-actions">
-        <a class="button" href="#contact">Book a conversation</a>
-        <span class="availability" data-status>
-          <span class="dot" aria-hidden="true"></span>
-          Taking new clients: <span data-status-month>[replace: yes/waitlist month]</span>
-        </span>
+    </div>
+    <p class="scroll-cue" aria-hidden="true">scroll<span class="cue-line"></span></p>
+  </section>
+
+  <!-- ===== SCENE 2 · MARQUEE ===== -->
+  <section class="strip" aria-labelledby="strip-h">
+    <h2 id="strip-h" class="visually-hidden">Services</h2>
+    <ul class="visually-hidden">
+      <li>Retirement planning</li><li>Wealth accumulation</li><li>Risk management</li>
+      <li>Tax-aware investing</li><li>Estate &amp; legacy</li>
+    </ul>
+    <div class="marquee" aria-hidden="true"><!-- div: decorative moving duplicate of the list above -->
+      <p class="marquee-track">
+        Retirement planning · Wealth accumulation · Risk management · Tax-aware investing · Estate &amp; legacy ·
+        Retirement planning · Wealth accumulation · Risk management · Tax-aware investing · Estate &amp; legacy ·
       </p>
-      <ul class="trust-chips" aria-label="Credentials">
-        <li>Economics, Bishop's University</li>
-        <li>Personal Financial Planning, Canadian Securities Institute</li>
-        <li>[replace: designation / years in practice]</li>
+    </div>
+  </section>
+
+  <!-- ===== SCENE 3 · SELF-DRAWING CHART ===== -->
+  <section class="scene" aria-labelledby="chart-h">
+    <canvas class="fx" data-fx="chart" aria-hidden="true"></canvas>
+    <div class="scene-inner">
+      <p class="eyebrow reveal">THE PLAN</p>
+      <h2 id="chart-h" class="giant reveal">Drawn to the decade,<br>not the day.</h2>
+      <p class="lede reveal">The line is your life — mapped, funded, reviewed.</p>
+    </div>
+  </section>
+
+  <!-- ===== SCENE 4 · FILM ===== -->
+  <section class="scene film" aria-labelledby="film-h">
+    <!-- [replace: drop real 4K footage at assets/film-4k.mp4 + poster at assets/film-poster.jpg] -->
+    <video class="film-video" autoplay muted loop playsinline preload="metadata"
+           poster="assets/film-poster.svg" width="3840" height="2160" aria-hidden="true">
+      <source src="assets/film-4k.mp4" type="video/mp4">
+    </video>
+    <canvas class="fx film-fallback" data-fx="silk" aria-hidden="true" hidden></canvas>
+    <div class="scene-inner">
+      <p class="eyebrow reveal">THE POINT</p>
+      <h2 id="film-h" class="giant reveal">Money is the means.<br><em>This is the end.</em></h2>
+      <p class="lede reveal">[replace: one line about the life the money buys — the cottage, the grandkids, the exit.]</p>
+    </div>
+  </section>
+
+  <!-- ===== SCENE 5 · NUMBERS ===== -->
+  <section class="scene numbers" aria-labelledby="numbers-h">
+    <h2 id="numbers-h" class="visually-hidden">Track record</h2>
+    <dl class="stats">
+      <div class="stat reveal"><!-- div: dt/dd pair wrapper for grid -->
+        <dd><span class="count" data-count="[replace: e.g. 20]">[replace]</span></dd>
+        <dt>years advising</dt>
+      </div>
+      <div class="stat reveal">
+        <dd><span class="count" data-count="[replace: e.g. 150]">[replace]</span>+</dd>
+        <dt>families served</dt>
+      </div>
+      <div class="stat reveal">
+        <dd>$<span class="count" data-count="[replace: e.g. 120]">[replace]</span>M</dd>
+        <dt>assets under advice</dt>
+      </div>
+    </dl>
+    <p class="finePrint reveal"><small>[replace: substantiation/date — required by compliance]</small></p>
+  </section>
+
+  <!-- ===== SCENE 6 · ABOUT (three lines, no essay) ===== -->
+  <section class="scene about" aria-labelledby="about-h">
+    <figure class="portrait reveal">
+      <img src="assets/portrait-placeholder.svg" alt="Portrait of Paul Sinclair" width="640" height="800" loading="lazy">
+    </figure>
+    <div class="scene-inner"><!-- div: text column beside figure, styling hook only -->
+      <p class="eyebrow reveal">THE ADVISOR</p>
+      <h2 id="about-h" class="giant reveal">A person,<br>not a product shelf.</h2>
+      <ul class="credits reveal">
+        <li>Economics — Bishop's University</li>
+        <li>Personal Financial Planning — Canadian Securities Institute</li>
+        <li>CI Assante Wealth Management</li>
       </ul>
     </div>
   </section>
 
-  <!-- ===== APPROACH ===== -->
-  <section id="approach" aria-labelledby="approach-h">
-    <p class="eyebrow reveal">HOW WE WORK</p>
-    <h2 id="approach-h" class="reveal">A plan first. Products last.</h2>
-    <ol class="steps">
-      <li class="reveal">
-        <h3>Listen</h3>
-        <p>One conversation about your life — family, work, worries, the retirement you actually picture. No pitch, no jargon.</p>
-      </li>
-      <li class="reveal">
-        <h3>Map</h3>
-        <p>A written plan that connects today's savings to tomorrow's income: cash flow, tax, insurance, and estate — one page you can explain to your spouse.</p>
-      </li>
-      <li class="reveal">
-        <h3>Build</h3>
-        <p>A portfolio matched to the plan, not the market's mood — diversified, cost-aware, and rebalanced on discipline instead of headlines.</p>
-      </li>
-      <li class="reveal">
-        <h3>Review</h3>
-        <p>Scheduled check-ins every [replace: cadence]. When your life changes, the plan changes — before the surprise, not after.</p>
-      </li>
-    </ol>
-  </section>
+  <!-- ===== SCENE 7 · CONTACT ===== -->
+  <section class="scene contact" id="contact" aria-labelledby="contact-h">
+    <canvas class="fx" data-fx="field" aria-hidden="true"></canvas>
+    <div class="scene-inner">
+      <p class="eyebrow reveal">START</p>
+      <h2 id="contact-h" class="giant reveal">Thirty minutes.<br>Zero obligation.</h2>
 
-  <!-- ===== SERVICES ===== -->
-  <section id="services" aria-labelledby="services-h">
-    <p class="eyebrow reveal">SERVICES</p>
-    <h2 id="services-h" class="reveal">Everything your money touches, under one plan</h2>
-    <ul class="services-grid">
-      <li class="reveal">
-        <h3>Retirement planning</h3>
-        <p>Know the number, the date, and the monthly income — then track against all three.</p>
-      </li>
-      <li class="reveal">
-        <h3>Wealth accumulation</h3>
-        <p>Registered and non-registered strategies sequenced for tax efficiency, not just returns.</p>
-      </li>
-      <li class="reveal">
-        <h3>Risk management</h3>
-        <p>Insurance and contingency planning sized to what your family actually needs covered.</p>
-      </li>
-      <li class="reveal">
-        <h3>[replace: service, e.g. Estate &amp; legacy]</h3>
-        <p>[replace: one-line description]</p>
-      </li>
-      <li class="reveal">
-        <h3>[replace: service, e.g. Business owners]</h3>
-        <p>[replace: one-line description]</p>
-      </li>
-      <li class="reveal">
-        <h3>[replace: service, e.g. Tax planning]</h3>
-        <p>[replace: one-line description]</p>
-      </li>
-    </ul>
-  </section>
+      <!-- [replace: point action at your form endpoint or booking tool] -->
+      <form class="callback reveal" action="#" method="post" novalidate>
+        <div class="field"><!-- div.field: label+input+error stack -->
+          <label for="cb-name">Name</label>
+          <input id="cb-name" name="name" type="text" autocomplete="name" required>
+          <p class="error" id="cb-name-err" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="cb-email">Email</label>
+          <input id="cb-email" name="email" type="email" autocomplete="email" required>
+          <p class="error" id="cb-email-err" aria-live="polite"></p>
+        </div>
+        <button class="button" type="submit">Request my callback</button>
+      </form>
 
-  <!-- ===== ABOUT ===== -->
-  <section id="about" aria-labelledby="about-h" class="about">
-    <figure class="portrait reveal">
-      <img src="assets/portrait-placeholder.svg" alt="Portrait of Paul Sinclair" width="640" height="800" loading="lazy">
-      <figcaption>Paul Sinclair, Financial Advisor</figcaption>
-    </figure>
-    <article class="bio">
-      <p class="eyebrow reveal">ABOUT</p>
-      <h2 id="about-h" class="reveal">Advice from a person, not a product shelf</h2>
-      <p class="reveal">
-        I came to advising through economics — first at York University, then a degree
-        from Bishop's University — and through the Canadian Securities Institute's
-        Personal Financial Planning program. The academics matter, but the job is
-        simpler than it sounds: understand what a family is trying to do, then make
-        the financial machinery serve it.
-      </p>
-      <p class="reveal">
-        [replace: 2–3 sentences in Paul's own words — years in practice, the kinds of
-        families and business owners he serves, what clients say working with him is like.]
-      </p>
-      <p class="reveal">
-        With CI Assante Wealth Management behind the practice, clients get an
-        independent advisor's attention with an institution's research, custody,
-        and planning resources.
-      </p>
-    </article>
-  </section>
-
-  <!-- ===== PROOF ===== -->
-  <section id="proof" aria-labelledby="proof-h">
-    <p class="eyebrow reveal">RESULTS</p>
-    <h2 id="proof-h" class="reveal">Measured in decades, not quarters</h2>
-    <dl class="stats">
-      <div class="stat reveal"><!-- div: dt/dd pair wrapper, required for dl grid styling -->
-        <dt>Years advising</dt>
-        <dd><span class="count" data-count="[replace: e.g. 20]">[replace]</span></dd>
+      <div class="confirm" hidden><!-- div: step-2 confirmation, revealed by script.js -->
+        <h3>You're in.</h3>
+        <p>Personal reply within <strong>[replace: SLA]</strong>.
+          <span class="availability" data-status>
+            <span class="dot" aria-hidden="true"></span>
+            Taking new clients: <span data-status-month>[replace: yes/waitlist]</span>
+          </span>
+        </p>
       </div>
-      <div class="stat reveal">
-        <dt>Families served</dt>
-        <dd><span class="count" data-count="[replace: e.g. 150]">[replace]</span>+</dd>
-      </div>
-      <div class="stat reveal">
-        <dt>Assets under advice</dt>
-        <dd>$<span class="count" data-count="[replace: e.g. 120]">[replace]</span>M</dd>
-      </div>
-      <div class="stat reveal">
-        <dt>Client retention</dt>
-        <dd><span class="count" data-count="[replace: e.g. 97]">[replace]</span>%</dd>
-      </div>
-    </dl>
-    <p class="finePrint reveal"><small>[replace: substantiation/date for the figures above — compliance will require it. Note: client testimonials on advisor sites are restricted under Canadian securities rules; confirm with Assante compliance before adding any.]</small></p>
-  </section>
-
-  <!-- ===== CONTACT ===== -->
-  <section id="contact" aria-labelledby="contact-h" class="contact">
-    <p class="eyebrow reveal">START</p>
-    <h2 id="contact-h" class="reveal">The first conversation costs nothing</h2>
-    <p class="reveal">Thirty minutes, no obligation. Bring one financial question that's been on your mind — leave with a straight answer.</p>
-
-    <!-- [replace: point action at your form endpoint or booking tool]. JS intercepts for the two-step flow; without JS the form POSTs to the action URL. -->
-    <form class="callback reveal" action="#" method="post" novalidate>
-      <div class="field"><!-- div.field: label+input+error stack, styling hook only -->
-        <label for="cb-name">Name</label>
-        <input id="cb-name" name="name" type="text" autocomplete="name" required>
-        <p class="error" id="cb-name-err" aria-live="polite"></p>
-      </div>
-      <div class="field">
-        <label for="cb-email">Email</label>
-        <input id="cb-email" name="email" type="email" autocomplete="email" required>
-        <p class="error" id="cb-email-err" aria-live="polite"></p>
-      </div>
-      <div class="field">
-        <label for="cb-phone">Phone <span class="optional">(optional)</span></label>
-        <input id="cb-phone" name="phone" type="tel" autocomplete="tel">
-        <p class="error" id="cb-phone-err" aria-live="polite"></p>
-      </div>
-      <button class="button" type="submit">Request my callback</button>
-    </form>
-
-    <div class="confirm" hidden><!-- div: step-2 confirmation panel, revealed by script.js -->
-      <h3>Thank you — you're on the list.</h3>
-      <p>I reply personally within <strong>[replace: SLA, e.g. one business day]</strong>.
-        <span class="availability" data-status>
-          <span class="dot" aria-hidden="true"></span>
-          Taking new clients: <span data-status-month>[replace: yes/waitlist month]</span>
-        </span>
-      </p>
     </div>
   </section>
 
@@ -207,11 +153,11 @@
 
 <footer class="site-footer">
   <address>
-    Paul Sinclair · Financial Advisor · CI Assante Wealth Management<br>
+    Paul Sinclair · Financial Advisor · CI Assante Wealth Management ·
     [replace: office address] · <a href="tel:[replace]">[replace: phone]</a> ·
     <a href="mailto:[replace]">[replace: email]</a>
   </address>
-  <p><small>[replace: required Assante/CI compliance disclaimer — the existing advisor.assante.com page's footer text must be carried over verbatim and approved before this site goes live.]</small></p>
+  <p><small>[replace: required Assante/CI compliance disclaimer — carry over verbatim from the current advisor.assante.com footer and get approval before launch.]</small></p>
   <p><small>© <span data-year>2026</span> Paul Sinclair.</small></p>
 </footer>
 

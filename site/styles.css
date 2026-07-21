@@ -73,6 +73,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 img, svg { max-width: 100%; height: auto; }
 
+[hidden] { display: none !important; } /* author display values must not defeat the hidden attribute */
+
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
 /* ============ LAYOUT ============ */

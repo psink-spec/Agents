@@ -1,156 +1,255 @@
-/* Progressive enhancement only — the page is fully usable without this file. */
+/* Progressive enhancement only — the page reads fine without this file. */
 (function () {
   "use strict";
 
   document.documentElement.classList.add("js");
 
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var darkMq = window.matchMedia("(prefers-color-scheme: dark)");
+  function isDark() {
+    var t = document.documentElement.getAttribute("data-theme");
+    return t ? t === "dark" : darkMq.matches;
+  }
 
-  /* ---- Scroll progress bar ---- */
+  /* ---- Scroll progress ---- */
   var progressEl = document.querySelector(".progress");
   function onScroll() {
     var doc = document.documentElement;
     var max = doc.scrollHeight - doc.clientHeight;
-    if (progressEl && max > 0) {
-      progressEl.style.setProperty("--scroll", String(doc.scrollTop / max));
-    }
+    if (progressEl && max > 0) progressEl.style.setProperty("--scroll", String(doc.scrollTop / max));
   }
   document.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* ---- Scroll reveals ---- */
+  /* ---- Reveals ---- */
   var revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          io.unobserve(entry.target);
-        }
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); }
       });
-    }, { threshold: 0.15, rootMargin: "0px 0px -5% 0px" });
+    }, { threshold: 0.2, rootMargin: "0px 0px -8% 0px" });
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
 
-  /* ---- Animated counters (skips [replace] placeholders gracefully) ---- */
+  /* ---- Counters (placeholder [replace] values are left untouched) ---- */
   document.querySelectorAll(".count").forEach(function (el) {
     var target = parseFloat(el.getAttribute("data-count"));
-    if (isNaN(target)) return; /* still a [replace: …] slot — leave text as-is */
+    if (isNaN(target)) return;
     el.textContent = "0";
     var animate = function () {
       if (reducedMotion.matches) { el.textContent = String(target); return; }
-      var start = null;
-      var duration = 1400;
-      function tick(ts) {
-        if (start === null) start = ts;
-        var t = Math.min((ts - start) / duration, 1);
-        var eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = String(Math.round(target * eased));
+      var start = null, duration = 1600;
+      (function tick(ts) {
+        if (start === null) start = ts || performance.now();
+        var t = Math.min(((ts || performance.now()) - start) / duration, 1);
+        el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
         if (t < 1) requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
+      })(performance.now());
     };
     if ("IntersectionObserver" in window) {
       var seen = false;
       new IntersectionObserver(function (entries, obs) {
         if (!seen && entries[0].isIntersecting) { seen = true; animate(); obs.disconnect(); }
-      }, { threshold: 0.6 }).observe(el);
-    } else {
-      animate();
-    }
+      }, { threshold: 0.5 }).observe(el);
+    } else animate();
   });
 
-  /* ---- Hero canvas: drifting market-lines + soft aurora glow ---- */
-  var canvas = document.querySelector(".hero-canvas");
-  if (canvas && canvas.getContext) {
-    var ctx = canvas.getContext("2d");
-    var dark = window.matchMedia("(prefers-color-scheme: dark)");
-    var raf = null;
+  /* ---- Canvas scenes: one rAF loop drives every .fx canvas ---- */
+  var canvases = [];
 
-    function size() {
+  function setupCanvas(canvas) {
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    var state = { canvas: canvas, ctx: ctx, kind: canvas.getAttribute("data-fx"), w: 0, h: 0, particles: null };
+    state.size = function () {
       var rect = canvas.getBoundingClientRect();
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return rect;
-    }
+      state.w = rect.width; state.h = rect.height;
+      state.particles = null; /* re-seed on resize */
+    };
+    state.size();
+    return state;
+  }
 
-    function draw(now) {
-      var rect = canvas.getBoundingClientRect();
-      var w = rect.width, h = rect.height;
-      var t = now / 1000;
-      ctx.clearRect(0, 0, w, h);
-
-      /* aurora orbs */
-      var orbs = [
-        { x: 0.82, y: 0.22, r: 0.5, hue: dark.matches ? "212, 169, 79" : "201, 154, 63", a: 0.14, sp: 0.11 },
-        { x: 0.15, y: 0.85, r: 0.45, hue: dark.matches ? "36, 84, 120" : "14, 34, 51", a: 0.10, sp: 0.07 }
-      ];
-      orbs.forEach(function (o, i) {
-        var ox = (o.x + Math.sin(t * o.sp + i * 2) * 0.05) * w;
-        var oy = (o.y + Math.cos(t * o.sp + i) * 0.05) * h;
-        var g = ctx.createRadialGradient(ox, oy, 0, ox, oy, o.r * Math.max(w, h));
-        g.addColorStop(0, "rgba(" + o.hue + "," + o.a + ")");
-        g.addColorStop(1, "rgba(" + o.hue + ",0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, w, h);
-      });
-
-      /* three gently rising lines, like well-behaved portfolios */
-      for (var l = 0; l < 3; l++) {
-        ctx.beginPath();
-        var alpha = 0.16 - l * 0.04;
-        ctx.strokeStyle = dark.matches
-          ? "rgba(212,169,79," + alpha + ")"
-          : "rgba(14,34,51," + alpha + ")";
-        ctx.lineWidth = 1.5;
-        for (var x = 0; x <= w; x += 8) {
-          var p = x / w;
-          var y = h * (0.85 - p * 0.35 - l * 0.08)
-            + Math.sin(p * 6 + t * (0.35 + l * 0.12) + l * 7) * h * 0.03
-            + Math.sin(p * 17 + t * 0.6 + l * 3) * h * 0.012;
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+  /* golden particle flow-field */
+  function drawField(s, t) {
+    var ctx = s.ctx, w = s.w, h = s.h;
+    if (!s.particles) {
+      s.particles = [];
+      var n = Math.min(240, Math.round(w * h / 6500));
+      for (var i = 0; i < n; i++) {
+        s.particles.push({ x: Math.random() * w, y: Math.random() * h, v: 0.35 + Math.random() * 0.8, r: 0.6 + Math.random() * 1.8 });
       }
     }
-
-    function loop(now) { draw(now); raf = requestAnimationFrame(loop); }
-
-    function start() {
-      size();
-      if (reducedMotion.matches) { draw(0); return; } /* static frame, no animation */
-      if (raf === null) raf = requestAnimationFrame(loop);
-    }
-    function stop() { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } }
-
-    start();
-    window.addEventListener("resize", function () { size(); if (reducedMotion.matches) draw(0); });
-    reducedMotion.addEventListener("change", function () { stop(); start(); });
-    dark.addEventListener("change", function () { if (reducedMotion.matches) draw(0); });
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) stop(); else start();
+    ctx.clearRect(0, 0, w, h);
+    /* aurora wash */
+    var g = ctx.createRadialGradient(w * 0.78, h * 0.25, 0, w * 0.78, h * 0.25, Math.max(w, h) * 0.7);
+    g.addColorStop(0, isDark() ? "rgba(212,169,79,0.13)" : "rgba(201,154,63,0.14)");
+    g.addColorStop(1, "rgba(201,154,63,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    var g2 = ctx.createRadialGradient(w * 0.12, h * 0.85, 0, w * 0.12, h * 0.85, Math.max(w, h) * 0.6);
+    g2.addColorStop(0, isDark() ? "rgba(36,84,120,0.14)" : "rgba(14,34,51,0.10)");
+    g2.addColorStop(1, "rgba(14,34,51,0)");
+    ctx.fillStyle = g2;
+    ctx.fillRect(0, 0, w, h);
+    /* particles drifting along a curl-ish field */
+    ctx.fillStyle = isDark() ? "rgba(229,195,122,0.75)" : "rgba(138,101,34,0.55)";
+    s.particles.forEach(function (p) {
+      var a = Math.sin(p.y * 0.006 + t * 0.25) + Math.cos(p.x * 0.004 - t * 0.18);
+      p.x += Math.cos(a) * p.v;
+      p.y += Math.sin(a) * p.v * 0.6 - 0.08;
+      if (p.x < -5) p.x = w + 5; if (p.x > w + 5) p.x = -5;
+      if (p.y < -5) p.y = h + 5; if (p.y > h + 5) p.y = -5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+      ctx.fill();
     });
   }
 
-  /* ---- Live availability from assets/status.json ---- */
+  /* chart that draws itself as its scene scrolls through the viewport */
+  function drawChart(s, t) {
+    var ctx = s.ctx, w = s.w, h = s.h;
+    var rect = s.canvas.getBoundingClientRect();
+    var vh = window.innerHeight || 1;
+    var progress = Math.min(Math.max((vh - rect.top) / (vh + rect.height * 0.6), 0), 1);
+    if (reducedMotion.matches) progress = 1;
+    ctx.clearRect(0, 0, w, h);
+    function y(p, l) {
+      return h * (0.88 - p * 0.55 - l * 0.05)
+        + Math.sin(p * 7 + l * 5) * h * 0.045
+        + Math.sin(p * 19 + l * 2) * h * 0.015;
+    }
+    for (var l = 0; l < 2; l++) {
+      var end = progress * (l === 0 ? 1 : 0.92);
+      /* area fill under the front line */
+      if (l === 0 && end > 0.02) {
+        ctx.beginPath();
+        ctx.moveTo(0, y(0, 0));
+        for (var px = 0; px <= end; px += 0.01) ctx.lineTo(px * w, y(px, 0));
+        ctx.lineTo(end * w, h); ctx.lineTo(0, h); ctx.closePath();
+        var fg = ctx.createLinearGradient(0, 0, 0, h);
+        fg.addColorStop(0, isDark() ? "rgba(212,169,79,0.10)" : "rgba(138,101,34,0.08)");
+        fg.addColorStop(1, "rgba(138,101,34,0)");
+        ctx.fillStyle = fg;
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.strokeStyle = l === 0
+        ? (isDark() ? "rgba(229,195,122,0.9)" : "rgba(138,101,34,0.8)")
+        : (isDark() ? "rgba(163,168,178,0.25)" : "rgba(14,34,51,0.18)");
+      ctx.lineWidth = l === 0 ? 2.5 : 1.25;
+      for (var p = 0; p <= end; p += 0.005) {
+        var xx = p * w, yy = y(p, l);
+        if (p === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+      }
+      ctx.stroke();
+      /* glowing endpoint on the front line */
+      if (l === 0 && end > 0.01) {
+        var ex = end * w, ey = y(end, 0);
+        var glow = ctx.createRadialGradient(ex, ey, 0, ex, ey, 26);
+        glow.addColorStop(0, isDark() ? "rgba(229,195,122,0.75)" : "rgba(201,154,63,0.6)");
+        glow.addColorStop(1, "rgba(201,154,63,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(ex, ey, 26, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = isDark() ? "#e5c37a" : "#8a6522";
+        ctx.beginPath(); ctx.arc(ex, ey, 4, 0, 6.2832); ctx.fill();
+      }
+    }
+  }
+
+  /* flowing silk — stands in for 4K footage when the video is missing */
+  function drawSilk(s, t) {
+    var ctx = s.ctx, w = s.w, h = s.h;
+    ctx.fillStyle = "#0e2233";
+    ctx.fillRect(0, 0, w, h);
+    for (var l = 0; l < 14; l++) {
+      ctx.beginPath();
+      var alpha = 0.05 + (l % 4) * 0.02;
+      ctx.strokeStyle = l % 3 === 0 ? "rgba(229,195,122," + alpha + ")" : "rgba(120,160,200," + alpha + ")";
+      ctx.lineWidth = 40;
+      for (var x = -60; x <= w + 60; x += 14) {
+        var p = x / w;
+        var yy = h * (0.15 + l * 0.06)
+          + Math.sin(p * 4 + t * 0.3 + l * 1.7) * h * 0.09
+          + Math.sin(p * 9 - t * 0.22 + l) * h * 0.035;
+        if (x === -60) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+      }
+      ctx.stroke();
+    }
+  }
+
+  var draws = { field: drawField, chart: drawChart, silk: drawSilk };
+  document.querySelectorAll(".fx").forEach(function (c) {
+    if (c.hidden) return; /* fallback canvases register when activated */
+    var s = setupCanvas(c);
+    if (s && draws[s.kind]) canvases.push(s);
+  });
+
+  var raf = null;
+  function frame(now) {
+    var t = now / 1000;
+    canvases.forEach(function (s) {
+      if (s.canvas.hidden) return;
+      var r = s.canvas.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return; /* offscreen: skip */
+      draws[s.kind](s, t);
+    });
+    raf = requestAnimationFrame(frame);
+  }
+  function startFx() {
+    if (reducedMotion.matches) { canvases.forEach(function (s) { draws[s.kind](s, 0); }); return; }
+    if (raf === null) raf = requestAnimationFrame(frame);
+  }
+  function stopFx() { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } }
+  startFx();
+
+  window.addEventListener("resize", function () {
+    canvases.forEach(function (s) { s.size(); });
+    if (reducedMotion.matches) canvases.forEach(function (s) { draws[s.kind](s, 0); });
+  });
+  reducedMotion.addEventListener("change", function () { stopFx(); startFx(); });
+  darkMq.addEventListener("change", function () { if (reducedMotion.matches) canvases.forEach(function (s) { draws[s.kind](s, 0); }); });
+  new MutationObserver(function () { if (reducedMotion.matches) canvases.forEach(function (s) { draws[s.kind](s, 0); }); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  document.addEventListener("visibilitychange", function () { if (document.hidden) stopFx(); else startFx(); });
+
+  /* ---- Film scene: if the real 4K file is missing, run the silk canvas instead ---- */
+  var film = document.querySelector(".film-video");
+  var filmFallback = document.querySelector(".film-fallback");
+  if (film && filmFallback) {
+    var useFallback = function () {
+      if (!filmFallback.hidden) return;
+      film.hidden = true;
+      filmFallback.hidden = false;
+      var s = setupCanvas(filmFallback);
+      if (s) { canvases.push(s); if (reducedMotion.matches) drawSilk(s, 0); }
+    };
+    film.addEventListener("error", useFallback);
+    var src = film.querySelector("source");
+    if (src) src.addEventListener("error", useFallback);
+    /* the 404 may have fired during parsing, before this deferred script ran */
+    if (film.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useFallback();
+    if (reducedMotion.matches) film.pause();
+  }
+
+  /* ---- Live availability ---- */
   fetch("assets/status.json", { cache: "no-store" })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
       if (!data || !data.booking) return;
-      document.querySelectorAll("[data-status-month]").forEach(function (el) {
-        el.textContent = data.booking;
-      });
+      document.querySelectorAll("[data-status-month]").forEach(function (el) { el.textContent = data.booking; });
       if (data.open === false) {
-        document.querySelectorAll("[data-status] .dot").forEach(function (el) {
-          el.style.background = "var(--ink-soft)";
-        });
+        document.querySelectorAll("[data-status] .dot").forEach(function (el) { el.style.background = "var(--ink-soft)"; });
       }
     })
-    .catch(function () { /* static fallback text stands */ });
+    .catch(function () { /* static fallback stands */ });
 
   /* ---- Footer year ---- */
   var year = document.querySelector("[data-year]");
@@ -167,26 +266,20 @@
     if (err) err.textContent = message;
     return !message;
   }
-
   function validateField(input) {
     var value = input.value.trim();
     if (input.required && !value) return setError(input, "Required.");
     if (input.type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       return setError(input, "That doesn't look like an email.");
     }
-    if (input.type === "tel" && value && !/^[\d\s()+.-]{7,}$/.test(value)) {
-      return setError(input, "That doesn't look like a phone number.");
-    }
     return setError(input, "");
   }
-
   form.querySelectorAll("input").forEach(function (input) {
     input.addEventListener("blur", function () { validateField(input); });
     input.addEventListener("input", function () {
       if (input.getAttribute("aria-invalid") === "true") validateField(input);
     });
   });
-
   form.addEventListener("submit", function (event) {
     var inputs = Array.prototype.slice.call(form.querySelectorAll("input"));
     var allValid = inputs.map(validateField).every(Boolean);
@@ -195,8 +288,7 @@
       inputs.find(function (i) { return i.getAttribute("aria-invalid") === "true"; }).focus();
       return;
     }
-
-    /* [replace: remove this block once the form action posts to a real endpoint] */
+    /* [replace: remove once the form action posts to a real endpoint] */
     event.preventDefault();
     form.hidden = true;
     confirmBox.hidden = false;

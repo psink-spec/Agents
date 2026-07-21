@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160" width="3840" height="2160" role="img" aria-label="Film poster placeholder">
+  <rect width="3840" height="2160" fill="#0e2233"/>
+  <path d="M0 1500 C 900 1300, 1500 1650, 2400 1400 S 3400 1500, 3840 1300 V 2160 H 0 Z" fill="#132c42"/>
+  <path d="M0 1700 C 1000 1550, 1800 1850, 2800 1600 S 3600 1700, 3840 1550 V 2160 H 0 Z" fill="#1d3a52"/>
+  <circle cx="3100" cy="500" r="180" fill="#c99a3f" opacity="0.85"/>
+  <text x="1920" y="2060" font-family="monospace" font-size="72" fill="#c99a3f" text-anchor="middle">[replace: 4K footage — assets/film-4k.mp4 + real poster frame]</text>
+</svg>
