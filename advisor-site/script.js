@@ -235,6 +235,7 @@
   var draws = { field: drawField, chart: drawChart, silk: drawSilk };
   document.querySelectorAll(".fx").forEach(function (c) {
     if (c.hidden) return; /* fallback canvases register when activated */
+    if (!c.getAttribute("data-fx")) return; /* WebGL canvases must never get a 2d context */
     var s = setupCanvas(c);
     if (s && draws[s.kind]) canvases.push(s);
   });
@@ -302,6 +303,114 @@
     if (video.readyState >= 2) useVideo();
     if (reducedMotion.matches) video.pause();
   });
+
+  /* ---- Explore dropdown: close on outside click / Escape ---- */
+  var menu = document.querySelector("[data-menu]");
+  if (menu) {
+    document.addEventListener("click", function (e) {
+      if (menu.open && !menu.contains(e.target)) menu.open = false;
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && menu.open) { menu.open = false; menu.querySelector("summary").focus(); }
+    });
+  }
+
+  /* ---- 3D particle terrain (Three.js), behind the numbers ---- */
+  var glCanvas = document.getElementById("gl-terrain");
+  if (glCanvas && window.THREE && window.WebGLRenderingContext) {
+    try {
+      var renderer = new THREE.WebGLRenderer({ canvas: glCanvas, alpha: true, antialias: false, powerPreference: "low-power" });
+      var glScene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(52, 1, 0.1, 400);
+      camera.position.set(0, 19, 54);
+      camera.lookAt(0, 0, 0);
+
+      var COLS = 160, ROWS = 60, SPACING = 1.1;
+      function buildLayer(color, size, opacity, phase) {
+        var positions = new Float32Array(COLS * ROWS * 3);
+        var geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        var mat = new THREE.PointsMaterial({
+          color: color, size: size, transparent: true, opacity: opacity,
+          sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending
+        });
+        var points = new THREE.Points(geo, mat);
+        points.userData.phase = phase;
+        glScene.add(points);
+        return points;
+      }
+      var gold = buildLayer(0xd4a94f, 0.38, 0.65, 0);
+      var steel = buildLayer(0x4a7aa8, 0.28, 0.35, 2.1);
+
+      function waveY(x, z, t, phase) {
+        return Math.sin(x * 0.28 + t * 0.7 + phase) * 1.6
+          + Math.cos(z * 0.22 + t * 0.45 + phase) * 1.9
+          + Math.sin((x + z) * 0.11 + t * 0.3) * 1.1;
+      }
+      function updateLayer(layer, t, lift) {
+        var pos = layer.geometry.attributes.position.array;
+        var i = 0;
+        for (var r = 0; r < ROWS; r++) {
+          for (var c = 0; c < COLS; c++) {
+            var x = (c - COLS / 2) * SPACING;
+            var z = (r - ROWS / 2) * SPACING;
+            pos[i++] = x;
+            pos[i++] = waveY(x, z, t, layer.userData.phase) + lift;
+            pos[i++] = z;
+          }
+        }
+        layer.geometry.attributes.position.needsUpdate = true;
+      }
+
+      var pointerX = 0;
+      if (window.matchMedia("(pointer: fine)").matches) {
+        document.addEventListener("mousemove", function (e) {
+          pointerX = (e.clientX / window.innerWidth - 0.5) * 2;
+        }, { passive: true });
+      }
+
+      function sizeGL() {
+        var rect = glCanvas.getBoundingClientRect();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        renderer.setSize(rect.width, rect.height, false);
+        camera.aspect = rect.width / Math.max(rect.height, 1);
+        camera.updateProjectionMatrix();
+      }
+      sizeGL();
+      window.addEventListener("resize", sizeGL);
+
+      var glRaf = null;
+      function glFrame(now) {
+        var t = now / 1000;
+        updateLayer(gold, t, -2);
+        updateLayer(steel, t, -4.5);
+        camera.position.x += (pointerX * 6 - camera.position.x) * 0.03;
+        camera.position.y = 19 + Math.sin(t * 0.12) * 1.5;
+        camera.lookAt(0, 0, 0);
+        renderer.render(glScene, camera);
+        glRaf = requestAnimationFrame(glFrame);
+      }
+      function glStart() {
+        if (reducedMotion.matches) { updateLayer(gold, 0, -2); updateLayer(steel, 0, -4.5); renderer.render(glScene, camera); return; }
+        if (glRaf === null) glRaf = requestAnimationFrame(glFrame);
+      }
+      function glStop() { if (glRaf !== null) { cancelAnimationFrame(glRaf); glRaf = null; } }
+
+      /* run only while the scene is on screen */
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting) glStart(); else glStop();
+        }, { threshold: 0.05 }).observe(glCanvas);
+      } else {
+        glStart();
+      }
+      reducedMotion.addEventListener("change", function () { glStop(); glStart(); });
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) glStop();
+        else if (glCanvas.getBoundingClientRect().bottom > 0) glStart();
+      });
+    } catch (e) { /* WebGL unavailable: the scene simply stays flat */ }
+  }
 
   /* ---- Live availability ---- */
   fetch("assets/status.json", { cache: "no-store" })

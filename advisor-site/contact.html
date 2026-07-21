@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact &amp; Location — Paul Sinclair | CI Assante Wealth Management</title>
+  <meta name="description" content="How to reach Paul Sinclair: phone, email, office location, hours, and what to bring to a first meeting.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <nav aria-label="Primary">
+    <a class="brand" href="index.html">PS<span class="brand-sub">Paul Sinclair · CI Assante</span></a>
+    <div class="nav-right"><!-- div: groups menu + CTA, styling hook only -->
+      <details class="menu" data-menu>
+        <summary aria-label="Explore all pages">Explore</summary>
+        <ul>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="about.html">About Paul</a></li>
+          <li><a href="contact.html" aria-current="page">Contact &amp; location</a></li>
+          <li class="menu-sep"><a href="index.html#approach">Our approach</a></li>
+          <li><a href="index.html#proof">Results</a></li>
+        </ul>
+      </details>
+      <a class="nav-cta" href="#callback">Talk to Paul</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page-main">
+  <header>
+    <p class="eyebrow">CONTACT</p>
+    <h1>Thirty minutes. Zero obligation.</h1>
+    <p class="lede">Call, write, or request a callback below — bring one financial question and leave with a straight answer.</p>
+  </header>
+
+  <ul class="info-list">
+    <li><span class="k">Phone</span><span><a href="tel:[replace]">[replace: phone from the original site]</a></span></li>
+    <li><span class="k">Email</span><span><a href="mailto:[replace]">[replace: email]</a></span></li>
+    <li><span class="k">Office</span><span>[replace: street address, city, province, postal code]</span></li>
+    <li><span class="k">Hours</span><span>[replace: office hours]</span></li>
+    <li><span class="k">Serving</span><span>[replace: regions served / meeting options — in person, phone, video]</span></li>
+  </ul>
+
+  <section class="prose" id="callback" aria-labelledby="cb-h">
+    <h2 id="cb-h">Request a callback</h2>
+    <!-- [replace: point action at your form endpoint or booking tool] -->
+    <form class="callback" action="#" method="post" novalidate>
+      <div class="field"><!-- div.field: label+input+error stack -->
+        <label for="cb-name">Name</label>
+        <input id="cb-name" name="name" type="text" autocomplete="name" required>
+        <p class="error" id="cb-name-err" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="cb-email">Email</label>
+        <input id="cb-email" name="email" type="email" autocomplete="email" required>
+        <p class="error" id="cb-email-err" aria-live="polite"></p>
+      </div>
+      <button class="button" type="submit">Request my callback</button>
+    </form>
+    <div class="confirm" hidden><!-- div: step-2 confirmation, revealed by script.js -->
+      <h3>You're in.</h3>
+      <p>Personal reply within <strong>[replace: SLA]</strong>.
+        <span class="availability" data-status>
+          <span class="dot" aria-hidden="true"></span>
+          Taking new clients: <span data-status-month>[replace: yes/waitlist]</span>
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <section class="prose">
+    <h2>What to bring to a first meeting</h2>
+    <p>Nothing is required — but if you want the most from the half hour, any of these help: a recent investment statement, your latest notice of assessment, pension or group-RRSP details, and the one question that's been on your mind.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <address>
+    Paul Sinclair · Financial Advisor · CI Assante Wealth Management ·
+    [replace: office address] · <a href="tel:[replace]">[replace: phone]</a> ·
+    <a href="mailto:[replace]">[replace: email]</a>
+  </address>
+  <p><small>[replace: required Assante/CI compliance disclaimer — carry over verbatim from the current advisor.assante.com footer.]</small></p>
+  <p><small>© <span data-year>2026</span> Paul Sinclair.</small></p>
+</footer>
+
+</body>
+</html>
