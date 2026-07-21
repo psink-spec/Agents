@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" width="640" height="800" role="img" aria-label="Portrait placeholder">
+  <rect width="640" height="800" fill="#0e2233"/>
+  <circle cx="320" cy="300" r="110" fill="#1d3a52"/>
+  <ellipse cx="320" cy="620" rx="200" ry="150" fill="#1d3a52"/>
+  <text x="320" y="770" font-family="monospace" font-size="26" fill="#c99a3f" text-anchor="middle">[replace: professional photo 640x800]</text>
+</svg>
