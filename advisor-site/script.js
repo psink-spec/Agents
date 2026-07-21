@@ -284,7 +284,13 @@
         }
       }
     }
-    function useVideo() { if (scene) scene.classList.add("has-video"); }
+    function useVideo() {
+      /* undo a hasty fallback: NETWORK_NO_SOURCE is also reported while source
+         selection is still pending, so loadeddata is the final word */
+      video.hidden = false;
+      if (fallback) fallback.hidden = true;
+      if (scene) scene.classList.add("has-video");
+    }
     video.addEventListener("loadeddata", useVideo);
     video.addEventListener("error", useFallback);
     /* when every <source> fails, the error event fires on the LAST one */
